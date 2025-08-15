@@ -1,6 +1,10 @@
 # Digital Signal Processing Filter Implementation
 
+## 🎯 Project Overview
+
 **A comprehensive implementation of IIR digital filtering with frequency domain analysis and audio processing capabilities.**
+
+This project demonstrates advanced signal processing concepts through a complete implementation of **Infinite Impulse Response (IIR) filtering** with comprehensive frequency and time domain analysis. Built using Python's scientific computing stack, it showcases both theoretical understanding and practical implementation skills essential for modern signal processing applications.
 
 ---
 
