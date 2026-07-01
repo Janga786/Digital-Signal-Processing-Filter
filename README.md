@@ -1,139 +1,115 @@
-# Digital Signal Processing Filter Implementation
+# Digital Signal Processing: Second-Order IIR Resonator
 
-## 🎯 Project Overview
+A Python implementation of a second-order IIR bandpass (resonator) filter, demonstrated on a multi-tone test signal. The project covers the full analysis pipeline: signal generation, spectral analysis via direct evaluation of the discrete-time Fourier transform (DTFT), filter design and frequency-response analysis, time-domain filtering with the recursive difference equation, and export of the results as plots and WAV audio files.
 
-**A comprehensive implementation of IIR digital filtering with frequency domain analysis and audio processing capabilities.**
+## What it does
 
-This project demonstrates advanced signal processing concepts through a complete implementation of **Infinite Impulse Response (IIR) filtering** with comprehensive frequency and time domain analysis. Built using Python's scientific computing stack, it showcases both theoretical understanding and practical implementation skills essential for modern signal processing applications.
+- Generates a 2-second test signal at a 20 kHz sampling rate: the sum of three cosines at digital frequencies pi/10, pi/5, and 3pi/10 radians/sample.
+- Computes the magnitude and phase spectra of the input and output signals by evaluating the DTFT directly on an 801-point frequency grid over [0, pi].
+- Designs a second-order IIR resonator with pole radius R = 0.95 and center frequency omega_0 = pi/5, with the gain normalized so the response at the center frequency is unity.
+- Plots the filter's magnitude and phase response using `scipy.signal.freqz`.
+- Applies the filter sample by sample with its difference equation and plots both the transient (first 201 samples) and steady-state segments of the output.
+- Writes the input and filtered signals to 16-bit WAV files so the effect of the filter is audible: the pi/5 tone passes through while the other two tones are attenuated.
 
----
+## Theory
 
-### Key Features:
-* **IIR Filter Design**: Implementation of Infinite Impulse Response filter with configurable parameters
-* **Frequency Domain Analysis**: Complete DTFT spectrum computation and visualization
-* **Time Domain Processing**: Multi-frequency test signal generation and filtering
-* **Audio Output**: WAV file generation for audible verification of filter performance
-* **Mathematical Visualization**: Detailed plots of magnitude/phase responses and time-domain signals
+The filter is a second-order resonator with transfer function
 
-### Tech Stack:
-* **Languages:** Python
-* **Key Libraries/Frameworks:** NumPy, SciPy, Matplotlib
-* **Mathematical Tools:** Discrete-Time Fourier Transform, Z-Transform, Digital Filter Theory
-
-### What I Learned
-This project deepened my understanding of fundamental signal processing concepts:
-* **Digital Filter Theory**: Mastered the mathematical foundations of IIR filter design, including pole-zero placement and stability analysis
-* **Frequency Domain Analysis**: Implemented DTFT computation from first principles, gaining insight into spectral analysis techniques crucial for robotics sensor processing
-* **Real-Time Processing Concepts**: Developed understanding of difference equations and recursive filtering that directly applies to real-time control systems
-* **Audio Signal Processing**: Gained experience with sampling rates, quantization, and audio file formats that translate to sensor data acquisition in robotics
-* **Mathematical Programming**: Strengthened skills in translating complex mathematical equations into efficient, readable code
-
-### Mathematical Foundation
-
-#### Filter Design
-The IIR filter implements a second-order resonator with the transfer function:
 ```
-H(z) = G / (1 - 2R·cos(ω₀)·z⁻¹ + R²·z⁻²)
+H(z) = G / (1 - 2R cos(omega_0) z^-1 + R^2 z^-2)
 ```
 
-Where:
-- `R` = pole radius (controls bandwidth)
-- `ω₀` = center frequency in radians/sample
-- `G` = gain normalization factor
+Its poles sit at `z = R e^(+/- j omega_0)`, i.e. at radius R = 0.95 just inside the unit circle at angles of +/- pi/5. Placing the poles close to the unit circle produces a narrow passband centered on omega_0; the pole radius controls the bandwidth. The gain
 
-#### Difference Equation
-The filter is implemented using the time-domain difference equation:
 ```
-y[n] = 2R·cos(ω₀)·y[n-1] - R²·y[n-2] + G·x[n]
+G = (1 - R) / sqrt(1 - 2R cos(2 omega_0) + R^2)
 ```
 
-### Filter Specifications
-- **Type**: IIR (Infinite Impulse Response) Digital Filter
-- **Order**: Second-order (biquad)
-- **Implementation**: Direct Form II difference equation
-- **Sampling Rate**: 20 kHz (configurable)
-- **Test Signal**: Multi-frequency cosine sum at π/10, π/5, and 3π/10 rad/sample
+normalizes the peak of the magnitude response to approximately 1. In the time domain the filter is realized by the recursive difference equation
 
-### Project Structure
 ```
-Digital_Signal_Processing_Filter/
-├── dsp_filter.py          # Main implementation with DSPFilter class
-├── requirements.txt       # Python dependencies
-├── output/               # Generated plots and audio files
-│   ├── filter_response.png
-│   ├── input_spectrum.png
-│   ├── output_spectrum.png
-│   ├── time_domain_analysis.png
-│   ├── input_signal.wav
-│   └── output_signal.wav
+y[n] = 2R cos(omega_0) y[n-1] - R^2 y[n-2] + G x[n]
+```
+
+Applied to the three-tone test signal, the resonator passes the pi/5 component and attenuates the components at pi/10 and 3pi/10.
+
+## Repository layout
+
+```
+Digital-Signal-Processing-Filter/
+├── dsp_filter.py          # Class-based implementation (DSPFilter) with full analysis pipeline
+├── DSP_Project/
+│   ├── main.py            # Original script version of the same analysis
+│   ├── input_signal.wav   # Pre-generated example: unfiltered three-tone signal
+│   └── output_signal.wav  # Pre-generated example: filtered (single-tone) result
+├── requirements.txt
+├── LICENSE
 └── README.md
 ```
 
-### How to Run It
+## Setup and usage
 
-#### Prerequisites
-Make sure you have Python 3.7+ installed on your system.
+Requires Python 3.9+.
 
-#### Setup and Execution
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Janga786/Digital_Signal_Processing_Filter.git
-   cd Digital_Signal_Processing_Filter
-   ```
+```bash
+git clone https://github.com/Janga786/Digital-Signal-Processing-Filter.git
+cd Digital-Signal-Processing-Filter
+pip install -r requirements.txt
+python dsp_filter.py
+```
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Each figure is displayed interactively and also saved to an `output/` directory; close each plot window to advance to the next step.
 
-3. Run the complete analysis:
-   ```bash
-   python dsp_filter.py
-   ```
+The `DSPFilter` class can also be used directly:
 
-#### Expected Output
-The program will generate:
-- **Frequency domain plots**: Magnitude and phase spectra of input/output signals
-- **Filter response plots**: Comprehensive analysis of the designed filter
-- **Time domain plots**: Signal comparison and steady-state analysis
-- **Audio files**: WAV files for audible verification of filtering effects
-- **Console output**: Detailed filter specifications and parameters
-
-### Example Usage
 ```python
 from dsp_filter import DSPFilter
 
-# Create filter instance
 filter_system = DSPFilter(sampling_rate=20000, duration=2)
-
-# Generate and process signal
-input_signal = filter_system.generate_test_signal()
+x = filter_system.generate_test_signal()
 b, a = filter_system.design_iir_filter(R=0.95, center_freq_ratio=1/5)
-output_signal = filter_system.apply_filter(input_signal)
-
-# Analyze results
-filter_system.compute_dtft_spectrum(output_signal, "Filtered Output")
+y = filter_system.apply_filter(x)
 filter_system.save_audio_files()
 ```
 
-### Technical Applications
-This implementation demonstrates concepts directly applicable to:
-- **Robotics**: Sensor data filtering for IMUs, encoders, and vision systems
-- **Control Systems**: Real-time signal conditioning for feedback loops
-- **Audio Processing**: Digital effects and noise reduction algorithms
-- **Communications**: Channel equalization and interference rejection
+## Output
 
-### Advanced Features
-- **Configurable Parameters**: Easy adjustment of filter characteristics
-- **Comprehensive Analysis**: Both frequency and time domain insights
-- **Professional Visualization**: Publication-quality plots with proper labeling
-- **Audio Verification**: Listen to the filtering effects
-- **Modular Design**: Clean OOP structure for easy extension
+Running `dsp_filter.py` produces the following files in `output/`:
 
-### Performance Considerations
-- **Numerical Stability**: Careful handling of recursive computations
-- **Memory Efficiency**: Optimized for large signal processing
-- **Vectorized Operations**: NumPy-based implementation for speed
-- **Visualization Quality**: High-DPI output suitable for presentations
+| File | Contents |
+| --- | --- |
+| `input_signal_spectrum.png` | Magnitude and phase spectra of the three-tone input |
+| `filter_response.png` | Magnitude and phase response of the designed resonator |
+| `output_signal_spectrum.png` | Magnitude and phase spectra of the filtered output |
+| `time_domain_analysis.png` | Transient and steady-state stem plots, input/output comparison |
+| `input_signal.wav`, `output_signal.wav` | Audio of the signal before and after filtering |
 
-This project showcases both theoretical understanding and practical implementation skills essential for signal processing applications in modern robotics and embedded systems.
+The console prints the filter specifications, for example:
+
+```
+Filter Type: IIR (Infinite Impulse Response)
+Sampling Rate: 20000 Hz
+Signal Duration: 2 seconds
+Total Samples: 40000
+
+Filter Parameters:
+  Pole Radius (R): 0.95
+  Center Frequency: 0.6283 rad/sample (2000.0 Hz)
+  Gain (G): 0.0436
+
+Filter Coefficients:
+  Numerator (b): [0.0436, 0, 0]
+  Denominator (a): [1, -1.5371, 0.9025]
+```
+
+Pre-generated example WAV files from the script version are included in `DSP_Project/`.
+
+## Dependencies
+
+- NumPy
+- SciPy
+- Matplotlib
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

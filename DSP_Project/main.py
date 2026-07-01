@@ -8,7 +8,7 @@ n = np.arange(201)
 x = np.cos((np.pi/10) * n) + np.cos((np.pi/5) * n) + np.cos(((3*np.pi)/10) * n)
 
 plt.figure()
-plt.stem(n, x, use_line_collection=True)
+plt.stem(n, x)
 plt.xlabel('n')
 plt.ylabel('x[n]')
 plt.title('First 201 Samples of x[n]')
@@ -78,7 +78,7 @@ for n in range(2, N):
 
 # Problem 10
 plt.figure()
-plt.stem(np.arange(201), y[:201], use_line_collection=True)
+plt.stem(np.arange(201), y[:201])
 plt.xlabel('n')
 plt.ylabel('y[n]')
 plt.title('Filter Output y[n] (First 201 Samples)')
@@ -86,7 +86,7 @@ plt.show()
 
 # Problem 11
 plt.figure()
-plt.stem(np.arange(201), y[10000:10201], use_line_collection=True)
+plt.stem(np.arange(201), y[10000:10201])
 plt.xlabel('n')
 plt.ylabel('y[n]')
 plt.title('Filter Output y[n] (Steady-State Segment)')

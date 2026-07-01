@@ -82,7 +82,8 @@ class DSPFilter:
         plt.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.savefig(f'{self.output_dir}/{title_prefix.lower()}_spectrum.png', 
+        filename = title_prefix.lower().replace(' ', '_')
+        plt.savefig(f'{self.output_dir}/{filename}_spectrum.png',
                    dpi=300, bbox_inches='tight')
         plt.show()
         
@@ -179,16 +180,14 @@ class DSPFilter:
         fig, axes = plt.subplots(2, 2, figsize=(15, 10))
         
         # Input signal - first samples
-        axes[0, 0].stem(np.arange(samples_to_plot), self.x[:samples_to_plot], 
-                       use_line_collection=True)
+        axes[0, 0].stem(np.arange(samples_to_plot), self.x[:samples_to_plot])
         axes[0, 0].set_title('Input Signal x[n] (First 201 Samples)')
         axes[0, 0].set_xlabel('Sample Number (n)')
         axes[0, 0].set_ylabel('Amplitude')
         axes[0, 0].grid(True, alpha=0.3)
         
         # Output signal - first samples
-        axes[0, 1].stem(np.arange(samples_to_plot), self.y[:samples_to_plot], 
-                       use_line_collection=True)
+        axes[0, 1].stem(np.arange(samples_to_plot), self.y[:samples_to_plot])
         axes[0, 1].set_title('Filter Output y[n] (First 201 Samples)')
         axes[0, 1].set_xlabel('Sample Number (n)')
         axes[0, 1].set_ylabel('Amplitude')
@@ -197,8 +196,7 @@ class DSPFilter:
         # Output signal - steady state
         steady_start = 10000
         steady_samples = np.arange(samples_to_plot)
-        axes[1, 0].stem(steady_samples, self.y[steady_start:steady_start+samples_to_plot], 
-                       use_line_collection=True)
+        axes[1, 0].stem(steady_samples, self.y[steady_start:steady_start+samples_to_plot])
         axes[1, 0].set_title('Filter Output y[n] (Steady-State)')
         axes[1, 0].set_xlabel('Sample Number (relative)')
         axes[1, 0].set_ylabel('Amplitude')
