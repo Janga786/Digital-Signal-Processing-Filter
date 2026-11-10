@@ -1,12 +1,12 @@
 # Digital Signal Processing: Second-Order IIR Resonator
 
-A Python implementation of a second-order IIR bandpass (resonator) filter, demonstrated on a multi-tone test signal. The project covers the full analysis pipeline: signal generation, spectral analysis via direct evaluation of the discrete-time Fourier transform (DTFT), filter design and frequency-response analysis, time-domain filtering with the recursive difference equation, and export of the results as plots and WAV audio files.
+A Python implementation of a second-order IIR bandpass (resonator) filter, demonstrated on a multi-tone test signal. It started as a homework assignment for my Digital Signal Processing course at Fort Lewis College: `DSP_Project/main.py` is the original script, organized by problem number, and `dsp_filter.py` is the same analysis restructured as a class. The project covers the full analysis pipeline: signal generation, spectral analysis via direct evaluation of the discrete-time Fourier transform (DTFT), filter design and frequency-response analysis, time-domain filtering with the recursive difference equation, and export of the results as plots and WAV audio files.
 
 ## What it does
 
 - Generates a 2-second test signal at a 20 kHz sampling rate: the sum of three cosines at digital frequencies pi/10, pi/5, and 3pi/10 radians/sample.
 - Computes the magnitude and phase spectra of the input and output signals by evaluating the DTFT directly on an 801-point frequency grid over [0, pi].
-- Designs a second-order IIR resonator with pole radius R = 0.95 and center frequency omega_0 = pi/5, with the gain normalized so the response at the center frequency is unity.
+- Designs a second-order IIR resonator with pole radius R = 0.95 and center frequency omega_0 = pi/5 (2 kHz at 20 kHz sampling).
 - Plots the filter's magnitude and phase response using `scipy.signal.freqz`.
 - Applies the filter sample by sample with its difference equation and plots both the transient (first 201 samples) and steady-state segments of the output.
 - Writes the input and filtered signals to 16-bit WAV files so the effect of the filter is audible: the pi/5 tone passes through while the other two tones are attenuated.
@@ -19,19 +19,19 @@ The filter is a second-order resonator with transfer function
 H(z) = G / (1 - 2R cos(omega_0) z^-1 + R^2 z^-2)
 ```
 
-Its poles sit at `z = R e^(+/- j omega_0)`, i.e. at radius R = 0.95 just inside the unit circle at angles of +/- pi/5. Placing the poles close to the unit circle produces a narrow passband centered on omega_0; the pole radius controls the bandwidth. The gain
+Its poles sit at `z = R e^(+/- j omega_0)`, i.e. at radius R = 0.95 just inside the unit circle at angles of +/- pi/5. Placing the poles close to the unit circle produces a narrow passband centered on omega_0; the pole radius controls the bandwidth. The code uses the gain
 
 ```
 G = (1 - R) / sqrt(1 - 2R cos(2 omega_0) + R^2)
 ```
 
-normalizes the peak of the magnitude response to approximately 1. In the time domain the filter is realized by the recursive difference equation
+With it the peak magnitude is about 0.76, not 1; unity gain at omega_0 for this all-pole form would need G = (1 - R) sqrt(1 - 2R cos(2 omega_0) + R^2). In the time domain the filter is realized by the recursive difference equation
 
 ```
 y[n] = 2R cos(omega_0) y[n-1] - R^2 y[n-2] + G x[n]
 ```
 
-Applied to the three-tone test signal, the resonator passes the pi/5 component and attenuates the components at pi/10 and 3pi/10.
+Applied to the three-tone test signal, the resonator passes the pi/5 component (|H| = 0.76) and attenuates the components at pi/10 (|H| = 0.16, about 13.6 dB below the peak) and 3pi/10 (|H| = 0.10, about 17.4 dB below).
 
 ## Repository layout
 
@@ -84,7 +84,7 @@ Running `dsp_filter.py` produces the following files in `output/`:
 | `time_domain_analysis.png` | Transient and steady-state stem plots, input/output comparison |
 | `input_signal.wav`, `output_signal.wav` | Audio of the signal before and after filtering |
 
-The console prints the filter specifications, for example:
+The console prints the filter specifications, for example (newer NumPy versions print the coefficients as `np.float64(...)`):
 
 ```
 Filter Type: IIR (Infinite Impulse Response)
